@@ -9,7 +9,8 @@ export default {
             const users = await UserModel.find({ _id: { $ne: req.params.id } }).select([
                 "_id",
                 "name",
-                "email"
+                "email",
+                "avatarlink"
             ]);
             return res.status(200).json({ success: true, users });
 
@@ -146,12 +147,14 @@ export default {
             const { sender, receiver } = req.body;
             const User = await UserModel.findOne({ _id: sender });
             const OtherUser = await UserModel.findOne({ _id: receiver });
-            console.log(`sender is ${User.name}`);
-            console.log(`sender is ${OtherUser.name}`);
-            User.chats.push(receiver);
-            User.save();
-            OtherUser.chats.push(sender);
-            OtherUser.save();
+            // console.log(`sender is ${User.name}`);
+            // console.log(`sender is ${OtherUser.name}`);
+            if (User.chats.includes(receiver) == false) {
+                User.chats.push(receiver);
+                User.save();
+                OtherUser.chats.push(sender);
+                OtherUser.save();
+            }
             return res.json({ msg: "chat started succesfully" });
         } catch (error) {
             console.log(error);
@@ -164,7 +167,22 @@ export default {
             // var all_users = [];
             var User = await UserModel.findOne({ _id: sender });
             console.log(User.chats.length);
-            return res.json({ "success": "false", "chats": User.chats });
+            return res.json({ success: "false", chats: User.chats });
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    setAvatar: async (req, res) => {
+        console.log("setting avatar");
+        try {
+            const { id, avatarlink } = req.body;
+            const User = await UserModel.findByIdAndUpdate(id, {
+                isAvatarset: true,
+                avatarlink
+            });
+            User.save();
+            console.log(User);
+            return res.json({ isset: User.isAvatarset, image: User.avatarlink });
         } catch (error) {
             console.log(error);
         }

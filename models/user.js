@@ -20,6 +20,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         unique: true,
     },
+    isAvatarset: {
+        type: Boolean,
+        default: false
+    },
+    avatarlink: {
+        type: String,
+        default: "",
+    },
     password: String,
     chats: Array,
 },
